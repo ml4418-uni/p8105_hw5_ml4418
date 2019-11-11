@@ -9,6 +9,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r}
 library(tidyverse)
+library(rvest)
 ```
 
 ```{r}
@@ -18,12 +19,49 @@ iris_with_missing = iris %>%
   map_df(~replace(.x, sample(1:150, 20), NA)) %>%
   mutate(Species = as.character(Species))
 
-iris = janitor::clean_names(iris_with_missing)
+df = janitor::clean_names(iris_with_missing)
 ```
 
 # problem 1
+
 ```{r}
-iris %>%
-  mutate(is.na(sepal_length), mean(sepal_length),
-         is.na(sepal_width), mean(sepal_width))
+filling_missing_value = function(x) { 
+  if (is.numeric(x))
+    {ifelse (is.na(x), mean(x, na.rm = TRUE), x)}
+  else
+    {ifelse (is.na(x), "virginica", x)}
+}
+
+df_replacing = map(df, filling_missing_value)
+df_filling = map_df(df, filling_missing_value)
+```
+
+# problem 2
+```{r}
+list = list.files("./data")
+
+data_set = map(list, read_csv)
+data_set
+```
+
+
+#problem 3
+```{r}
+sim_regression = function(n, beta0 = 2, beta1 = 0) {
+  
+  sim_data = tibble(
+    x = rnorm(n, mean = 0, sd = 1),
+    y = beta0 + beta1 * x + rnorm(n, 0, 1)
+  )
+  
+  ls_fit = lm(y ~ x, data = sim_data)
+  
+  tibble(beta1_hat = coef(ls_fit)[2])
+}
+
+
+
+
+
+
 ```
