@@ -135,5 +135,3 @@ ggplot(df_plot, aes(x = beta1, y = mean, group = type, color = type)) +
   geom_line() +
   theme_bw()
 ```
-
-```
